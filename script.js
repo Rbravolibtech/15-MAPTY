@@ -1,7 +1,19 @@
 'use strict';
 
-// prettier-ignore
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
@@ -11,6 +23,46 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+class Workout {
+  date = new Date();
+  id = (Date.now() + '').slice(-10);
+
+  constructor(coords, distance, duration) {
+    //this.date = ...
+    //this.id = ...
+    this.coords = coords; // latitude and longitude
+    this.distance = distance; // km
+    this.duration = duration; // in Minutes
+  }
+}
+
+class Running extends Workout {
+  constructor(coords, distance, duration, cadence) {
+    super(coords, distance, duration);
+    this.cadence = cadence;
+    this.calcPace();
+  }
+
+  calcPace() {
+    //min//km
+    this.pace = this.duration / this.distance;
+    return this.pace;
+  }
+}
+
+class Cycling extends Workout {
+  constructor(coords, distance, duration, elevationGain) {
+    super(coords, distance, duration);
+    this.elevationGain = elevationGain;
+  }
+  calcSpeed() {
+    //km/h
+    this.speed = this.distance / (this.duration / 60);
+    return this.speed;
+  }
+}
+
+/////////////////// APPLICATION ARCHITECTURE ////////////////
 class App {
   #map;
   #mapEvent;
@@ -43,7 +95,7 @@ class App {
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
+    }).addTo(this.#map);
 
     //HANDLING CLICKS ON MAP
     this.#map.on('click', this._showForm.bind(this));
@@ -78,7 +130,7 @@ class App {
       .bindPopup(
         L.popup({
           maxWidth: 250,
-          maxWidth: 100,
+          maxHeight: 100,
           autoClose: false,
           closeOnClick: false,
           className: 'running-popup',
@@ -90,4 +142,3 @@ class App {
 }
 
 const app = new App();
-app._getPosition();
